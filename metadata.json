@@ -1,0 +1,5 @@
+{
+  "name": "AI Video Subtitle Generator",
+  "description": "An application to automatically generate, translate, and edit subtitles for video files. Users can upload a video, get a generated transcript, translate it to over 50 languages using Gemini, edit the results, and download them in standard subtitle formats.",
+  "requestFramePermissions": []
+}
