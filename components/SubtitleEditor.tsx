@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { SubtitleEntry } from '../types';
+import SubtitleLine from './SubtitleLine';
 
 interface SubtitleEditorProps {
   subtitles: SubtitleEntry[];
@@ -52,13 +53,10 @@ const SubtitleEditor: React.FC<SubtitleEditorProps> = ({ subtitles, onSubtitleCh
               <div className="font-mono text-sm text-slate-400 text-center md:text-left">
                 {formatTime(entry.startTime)} &rarr; {formatTime(entry.endTime)}
               </div>
-              <textarea
-                value={entry.text}
-                onClick={(e) => e.stopPropagation()} // Prevent seek when clicking textarea
-                onChange={(e) => onSubtitleChange(index, e.target.value)}
-                className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded-md p-2 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition resize-none"
-                rows={2}
-                aria-label={`Subtitle text for time ${formatTime(entry.startTime)}`}
+              <SubtitleLine
+                entry={entry}
+                index={index}
+                onSubtitleChange={onSubtitleChange}
               />
             </div>
           );

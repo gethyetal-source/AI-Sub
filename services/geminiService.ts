@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { SubtitleEntry } from "../types";
+import { SubtitleEntry, SpellCheckResult } from "../types";
 
 const API_KEY = process.env.API_KEY;
 
@@ -242,5 +242,56 @@ ${JSON.stringify(originalTexts)}
         throw new Error("Failed to parse translation from Gemini API. The response was not valid JSON.");
     }
     throw new Error("Failed to get translation from Gemini API. Please check your API key and network connection.");
+  }
+};
+
+export const checkSpelling = async (text: string): Promise<SpellCheckResult[]> => {
+  if (!text.trim()) {
+    return [];
+  }
+
+  const prompt = `You are an expert spell-checker. Analyze the following text and identify any misspelled words.
+For each misspelled word you find, provide up to three correction suggestions.
+Your response MUST be a valid JSON array of objects.
+Each object must contain two keys: "word" (the misspelled word as it appears in the text) and "suggestions" (an array of strings with corrections).
+If there are no spelling errors, return an empty JSON array.
+
+Text to analyze:
+"${text}"
+`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              word: { type: Type.STRING, description: "The misspelled word." },
+              suggestions: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+                description: "An array of correction suggestions."
+              }
+            },
+            required: ["word", "suggestions"]
+          }
+        }
+      }
+    });
+
+    const result = JSON.parse(response.text);
+    if (Array.isArray(result)) {
+      return result;
+    }
+    return [];
+  } catch (error) {
+    console.error("Error during spell check:", error);
+    // Don't throw an error, just return no results to prevent UI crash
+    return [];
   }
 };

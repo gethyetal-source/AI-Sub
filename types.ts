@@ -4,3 +4,8 @@ export interface SubtitleEntry {
   endTime: number;
   text: string;
 }
+
+export interface SpellCheckResult {
+  word: string;
+  suggestions: string[];
+}
